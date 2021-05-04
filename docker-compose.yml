@@ -1,0 +1,32 @@
+version: '3'
+services:
+    go:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile.local
+        volumes:
+            - ./backend:/go/src/backend
+        working_dir: /go/src/backend
+        environment:
+            TZ: Asia/Tokyo
+        ports:
+            - 8080:8080
+            - 2345:2345
+        security_opt: 
+            - apparmor:unconfined
+        cap_add: 
+            - SYS_PTRACE
+
+    mysql:
+        build: ./mysql
+        environment:
+            TZ: Asia/Tokyo
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: backend
+        ports:
+            - 13306:3306
+        volumes:
+            - mysql_volume:/var/lib/mysql
+    
+volumes:
+    mysql_volume:
