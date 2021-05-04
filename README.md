@@ -1,0 +1,1 @@
+# next-gin-mysql
