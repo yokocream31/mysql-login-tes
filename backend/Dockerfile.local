@@ -1,6 +1,3 @@
-FROM golang:1.15.2
+FROM golang:1.19
 COPY . /go/src/sample
 WORKDIR /go/src/sample
-RUN go get -u github.com/cosmtrek/air
-RUN go get -u github.com/go-delve/delve/cmd/dlv
-CMD ["air", "-c", ".air.toml"]**

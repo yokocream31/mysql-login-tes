@@ -1,6 +1,7 @@
 version: '3'
 services:
     go:
+        restart: always
         build:
             context: ./backend
             dockerfile: Dockerfile.local
@@ -16,6 +17,7 @@ services:
             - apparmor:unconfined
         cap_add: 
             - SYS_PTRACE
+        tty: true
 
     mysql:
         build: ./mysql

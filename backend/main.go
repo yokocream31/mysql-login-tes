@@ -55,6 +55,7 @@ func main() {
 	r.GET("/article", handler.ArticlesGet(article))
 	r.POST("/article", handler.ArticlePost(article))
 	// userはとりあえずlogin処理のみ
+	r.GET("/user", handler.UsersGet(user))
 	r.POST("/user/login", handler.UserPost(user))
 
 	r.Run(os.Getenv("HTTP_HOST") + ":" + os.Getenv("HTTP_PORT")) // listen and serve on 0.0.0.0:8080
