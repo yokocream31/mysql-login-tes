@@ -2,12 +2,10 @@ package lib
 
 import (
 	"fmt"
-	"os"
 	"time"
 
-	"gorm.io/gorm"
-
 	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 // SQLHandler ...
@@ -31,33 +29,21 @@ func DBClose() {
 
 // NewSQLHandler ...
 func NewSQLHandler() *SQLHandler {
-	user := os.Getenv("DB_USERNAME")
-	password := os.Getenv("DB_PASSWORD")
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_DATABASE")
-	fmt.Println(user, password, host, port)
+	fmt.Println("kokookkokokko")
+	user := "root"
+	password := "root"
+	// port := "3306"
+	dbName := "backend"
+	// fmt.Println(user, password, host, port, dbName)
 
 	var db *gorm.DB
 	var err error
 	// Todo: USE_HEROKU = 1のときと場合分け
-	if os.Getenv("USE_HEROKU") != "1" {
-		dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbName + "?parseTime=true&loc=Asia%2FTokyo"
-		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err != nil {
-			panic(err)
-		}
-	} /*else {
-		var (
-			instanceConnectionName = os.Getenv("DB_CONNECTION_NAME") // e.g. 'project:region:instance'
-		)
-		dbURI := fmt.Sprintf("%s:%s@unix(/cloudsql/%s)/%s?parseTime=true", user, password, instanceConnectionName, database)
-		// dbPool is the pool of database connections.
-		db, err = gorm.Open(mysql.Open(dbURI), &gorm.Config{})
-		if err != nil {
-			panic(err)
-		}
-	}*/
+	dsn := user + ":" + password + "@tcp(godockerDB)/" + dbName + "?parseTime=true"
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
 
 	sqlDB, _ := db.DB()
 	//コネクションプールの最大接続数を設定。

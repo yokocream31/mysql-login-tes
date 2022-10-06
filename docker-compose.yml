@@ -5,9 +5,9 @@ services:
         build:
             context: ./backend
             dockerfile: Dockerfile.local
-        volumes:
-            - ./backend:/go/src/backend
-        working_dir: /go/src/backend
+        # volumes:
+        #     - ./backend:/go/src/backend
+        # working_dir: /go/src/backend
         environment:
             TZ: Asia/Tokyo
         ports:
@@ -21,10 +21,12 @@ services:
 
     mysql:
         build: ./mysql
+        container_name: godockerDB
         environment:
-            TZ: Asia/Tokyo
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: backend
+            MYSQL_USER: user
+            MYSQL_PASSWORD: pass
         ports:
             - 13306:3306
         volumes:
