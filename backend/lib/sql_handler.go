@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -29,7 +28,7 @@ func DBClose() {
 
 // NewSQLHandler ...
 func NewSQLHandler() *SQLHandler {
-	fmt.Println("kokookkokokko")
+	// fmt.Println("kokookkokokko")
 	user := "root"
 	password := "root"
 	// port := "3306"
