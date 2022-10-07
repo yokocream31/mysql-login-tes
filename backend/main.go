@@ -6,9 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/greenteabiscuit/next-gin-mysql/backend/crypto"
 	"github.com/greenteabiscuit/next-gin-mysql/backend/lib"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -39,13 +37,13 @@ func main() {
 	defer sqlDB.Close()
 
 	r := gin.Default()
-	r.LoadHTMLGlob("views/*.html")
+	// r.LoadHTMLGlob("views/*.html")
 
 	// ユーザー登録画面
 	r.GET("/signup", func(c *gin.Context) {
 		c.JSON(200, gin.H{"result": "ok"})
 
-		c.HTML(200, "signup.html", gin.H{})
+		// c.HTML(200, "signup.html", gin.H{})
 	})
 
 	// ユーザー登録
@@ -56,14 +54,15 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		} else {
-			username := c.PostForm("username")
-			password := c.PostForm("password")
+			// username := c.PostForm("username")
+			password := form.Password
 
-			//エラーが出てます!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			fmt.Println(form.Username)
-			fmt.Println(username)
+			// fmt.Println(form.Username)
+			// fmt.Println(username)
 
-			passwordEncrypt, _ := crypto.PasswordEncrypt(password)
+			// passwordEncrypt, _ := crypto.PasswordEncrypt(password)
+			passwordEncrypt := password
+
 			db := lib.NewSQLHandler().DB
 			// Insert処理
 			db.Create(&User{Username: form.Username, Password: passwordEncrypt})
@@ -79,30 +78,48 @@ func main() {
 	// ユーザーログイン画面
 	r.GET("/login", func(c *gin.Context) {
 		c.JSON(200, gin.H{"result": "ok"})
-		c.HTML(200, "login.html", gin.H{})
+		// c.HTML(200, "login.html", gin.H{})
 	})
 
 	// ユーザーログイン
 	r.POST("/login", func(c *gin.Context) {
-
-		// DBから取得したユーザーパスワード(Hash)
-		dbPassword := getUser(c.PostForm("username")).Password
-		log.Println(dbPassword)
-		// フォームから取得したユーザーパスワード
-		formPassword := c.PostForm("password")
-		fmt.Println("送られたパスワード")
-		fmt.Println(dbPassword, formPassword)
-
-		// ユーザーパスワードの比較
-		err := bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(formPassword))
-		if err != nil {
-			log.Println("ログインできませんでした")
-			c.HTML(http.StatusBadRequest, "login.html", gin.H{"err": err})
-			c.Abort()
+		var form User
+		// バリデーション処理
+		if err := c.ShouldBindJSON(&form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		} else {
-			log.Println("ログインできました")
-			c.JSON(200, gin.H{"result": "ok"})
-			// c.Redirect(302, "/")
+
+			// DBから取得したユーザーパスワード(Hash)
+			fmt.Println(form.Username)
+			fmt.Println(form.Password)
+
+			// dbPassword := getUser(form.Username).Password
+			// log.Println(dbPassword)
+			db := lib.NewSQLHandler().DB
+			var user User
+			db.First(&user, "username = ?", form.Username)
+			dbPassword := user.Password
+			// フォームから取得したユーザーパスワード
+			formPassword := form.Password
+			fmt.Println("送られたパスワード")
+			fmt.Println(dbPassword, formPassword)
+
+			// ユーザーパスワードの比較
+			// passwordEncrypt, _ := crypto.PasswordEncrypt(formPassword)
+			// fmt.Println(dbPassword, passwordEncrypt)
+			// err := crypto.CompareHashAndPassword(dbPassword, formPassword)
+
+			if dbPassword != formPassword {
+				log.Println("ログインできませんでした")
+				c.Abort()
+			} else {
+				log.Println("ログインできました")
+				c.JSON(200, gin.H{"result": "ok"})
+				// c.Redirect(302, "/")
+			}
+			// sqlDB, _ := db.DB()
+			// defer sqlDB.Close()
 		}
 	})
 	r.Run()
